@@ -13,11 +13,9 @@ public class CamerController : MonoBehaviour
 
     private void Start()
     {
-        GameObject go = GameObject.Find("Player");
-        PlayerMovement playerMovement = go.GetComponent<PlayerMovement>();
-        float playerXVel = playerMovement.xVelocity;
-        float playerYVel = playerMovement.yVelocity;
-        bool playerGrounded = playerMovement.IsGrounded();
+
+
+
     }
 
     //room camera
