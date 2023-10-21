@@ -9,6 +9,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float Friction;
 
     [Header("Dash")]
+    [SerializeField] private float yDashHeightDivider = 2;
+    [SerializeField] private float DashLockoutTime;
     [SerializeField] private float GroundedDashForce;
     [SerializeField] private float AerialDashForce;
     [SerializeField] private float MaxDashTime = (float)0.2;
@@ -23,13 +25,19 @@ public class PlayerMovement : MonoBehaviour
     public GameObject fallDetector;
     public GameObject dialoguePanel;
 
+    public Vector2 ActualDirection;
+
     private Vector3 respawnPoint;
-    private int direction = 1;
+    private int Xdirection = 1;
+    private int Ydirection = 0;
     private bool m_FacingRight;
 
     public float xVelocity;
     public float yVelocity;
 
+    private bool isDashLockoutTimeUp = true;
+
+    private string directionFacing = "";
     private bool isDashTimeUp = true;
     private bool isDashRecharged;
     private bool isdoubleJumpAvaliable;
@@ -66,7 +74,7 @@ public class PlayerMovement : MonoBehaviour
         //move left right
         if (Input.GetKey(KeyCode.A))
         {
-            direction = -1;
+            Xdirection = -1;
             body.velocity = new Vector2(body.velocity.x - 1, body.velocity.y);
 
             if ((body.velocity.x * -1) > moveSpeed)
@@ -74,14 +82,32 @@ public class PlayerMovement : MonoBehaviour
                 body.velocity = new Vector2(Mathf.Floor(body.velocity.x + Friction), body.velocity.y);
             }
         }
-        if (Input.GetKey(KeyCode.D))
+        else if (Input.GetKey(KeyCode.D))
         {
-            direction = 1;
+            Xdirection = 1;
             body.velocity = new Vector2(body.velocity.x + 1, body.velocity.y);
             if (body.velocity.x > moveSpeed)
             {
                 body.velocity = new Vector2(Mathf.Floor(body.velocity.x - Friction), body.velocity.y);
             }
+        }
+        else
+        {
+            Xdirection = 0;
+        }
+
+
+        if (Input.GetKey(KeyCode.W))
+        {
+            Ydirection = 1;
+        }
+        else if (Input.GetKey(KeyCode.S))
+        {
+            Ydirection = -1;
+        }
+        else
+        {
+            Ydirection = 0;
         }
 
         //friction calculation
@@ -115,10 +141,10 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        ActualDirection = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")).normalized;
 
         //jump
-        if (Input.GetKeyDown(KeyCode.J))
+        if (Input.GetKeyDown(KeyCode.J) && isDashLockoutTimeUp)
         {
             Jump();
         }
@@ -160,26 +186,97 @@ public class PlayerMovement : MonoBehaviour
     {
         isDashRecharged = false;
         StartCoroutine("DashTiming");
+        StartCoroutine("DashLockoutTiming");
+        body.velocity = ActualDirection * GroundedDashForce;
         if (IsGrounded())
         {
-            if (direction > 0)
+
+            if (Xdirection > 0)
             {
-                body.velocity = new Vector2(body.velocity.x + GroundedDashForce, body.velocity.y);
+                if(Ydirection > 0)
+                {
+                    body.velocity = new Vector2(body.velocity.x + (GroundedDashForce/2), body.velocity.y + (GroundedDashForce / 2));
+                }
+                else if (Ydirection < 0)
+                {
+                    body.velocity = new Vector2(body.velocity.x + (GroundedDashForce / 2), body.velocity.y - (GroundedDashForce / 2));
+                }
+                else
+                {
+                    body.velocity = new Vector2(body.velocity.x + GroundedDashForce, body.velocity.y);
+                }
+                
+            }
+            else if (Xdirection < 0)
+            {
+                if (Ydirection > 0)
+                {
+                    body.velocity = new Vector2(body.velocity.x - (GroundedDashForce / 2), body.velocity.y + (GroundedDashForce / 2));
+                }
+                else if (Ydirection < 0)
+                {
+                    body.velocity = new Vector2(body.velocity.x - (GroundedDashForce / 2), body.velocity.y - (GroundedDashForce / 2));
+                }
+                else
+                {
+                    body.velocity = new Vector2(body.velocity.x - GroundedDashForce, body.velocity.y);
+                }
             }
             else
             {
-                body.velocity = new Vector2(body.velocity.x - GroundedDashForce, body.velocity.y);
+                if (Ydirection > 0)
+                {
+                    body.velocity = new Vector2(body.velocity.x, body.velocity.y + (GroundedDashForce / yDashHeightDivider));
+                }
+                else if (Ydirection < 0)
+                {
+                    body.velocity = new Vector2(body.velocity.x, body.velocity.y - (GroundedDashForce / yDashHeightDivider));
+                }
             }
         }
         else
         {
-            if (direction > 0)
+            if (Xdirection > 0)
             {
-                body.velocity = new Vector2(body.velocity.x + AerialDashForce, body.velocity.y);
+                if (Ydirection > 0)
+                {
+                    body.velocity = new Vector2(body.velocity.x + (AerialDashForce/2), body.velocity.y + (AerialDashForce / 2));
+                }
+                else if (Ydirection < 0)
+                {
+                    body.velocity = new Vector2(body.velocity.x + (AerialDashForce / 2), body.velocity.y - (AerialDashForce / 2));
+                }
+                else
+                {
+                    body.velocity = new Vector2(body.velocity.x + AerialDashForce, body.velocity.y);
+                }
+
+            }
+            else if (Xdirection < 0)
+            {
+                if (Ydirection > 0)
+                {
+                    body.velocity = new Vector2(body.velocity.x - (AerialDashForce / 2), body.velocity.y + (AerialDashForce / 2));
+                }
+                else if (Ydirection < 0)
+                {
+                    body.velocity = new Vector2(body.velocity.x - (AerialDashForce / 2), body.velocity.y - (AerialDashForce / 2));
+                }
+                else
+                {
+                    body.velocity = new Vector2(body.velocity.x - AerialDashForce, body.velocity.y);
+                }
             }
             else
             {
-                body.velocity = new Vector2(body.velocity.x - AerialDashForce, body.velocity.y);
+                if (Ydirection > 0)
+                {
+                    body.velocity = new Vector2(body.velocity.x, body.velocity.y + (AerialDashForce/yDashHeightDivider));
+                }
+                else if (Ydirection < 0)
+                {
+                    body.velocity = new Vector2(body.velocity.x, body.velocity.y - (AerialDashForce / yDashHeightDivider));
+                }
             }
         }
     }
@@ -195,6 +292,22 @@ public class PlayerMovement : MonoBehaviour
 
         yield return new WaitForSeconds(MaxDashTime);
         isDashTimeUp = true;
+        //anim.SetBool("Dashing", false);
+        //ghost.makeGhost = false;
+
+    }
+
+    IEnumerator DashLockoutTiming()
+    {
+
+        // execute block of code here
+        //ghost.makeGhost = true;
+        //anim.SetBool("Dashing", true);
+        isDashLockoutTimeUp = false;
+
+
+        yield return new WaitForSeconds(DashLockoutTime);
+        isDashLockoutTimeUp = true;
         //anim.SetBool("Dashing", false);
         //ghost.makeGhost = false;
 
@@ -225,6 +338,11 @@ public class PlayerMovement : MonoBehaviour
         if (IsGrounded() || coyoteCounter > 0)
         {
             body.velocity = new Vector2(body.velocity.x, JumpForce);
+        }
+        else if (isdoubleJumpAvaliable)
+        {
+            body.velocity = new Vector2(body.velocity.x, JumpForce);
+            isdoubleJumpAvaliable = false;
         }
         coyoteCounter = 0;
     }

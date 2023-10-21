@@ -338,6 +338,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 15
   Friction: 1
+  yDashHeightDivider: 2
+  DashLockoutTime: 0.3
   GroundedDashForce: 20
   AerialDashForce: 20
   MaxDashTime: 2
@@ -348,6 +350,7 @@ MonoBehaviour:
     m_Bits: 64
   fallDetector: {fileID: 2017918490}
   dialoguePanel: {fileID: 907161255}
+  ActualDirection: {x: 0, y: 0}
   xVelocity: 0
   yVelocity: 0
 --- !u!50 &606082849
