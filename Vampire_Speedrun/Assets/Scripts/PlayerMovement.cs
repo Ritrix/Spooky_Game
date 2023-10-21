@@ -18,6 +18,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Misc")]
     [SerializeField] private LayerMask platformLayerMask;
     public GameObject fallDetector;
+    public GameObject dialoguePanel;
 
     private Vector3 respawnPoint;
     private int direction = 1;
@@ -136,6 +137,18 @@ public class PlayerMovement : MonoBehaviour
         if (collision.tag == "FallDetector")
         {
             transform.position = respawnPoint;
+        }
+        if (collision.tag == "Sign")
+        {
+            dialoguePanel.SetActive(true);
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.tag == "Sign")
+        {
+            dialoguePanel.SetActive(false);
         }
     }
 
