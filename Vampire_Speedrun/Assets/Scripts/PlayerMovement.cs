@@ -9,7 +9,6 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float Friction;
 
     [Header("Dash")]
-    [SerializeField] private float yDashHeightDivider = 2;
     [SerializeField] private float DashLockoutTime;
     [SerializeField] private float GroundedDashForce;
     [SerializeField] private float AerialDashForce;
@@ -25,11 +24,8 @@ public class PlayerMovement : MonoBehaviour
     public GameObject fallDetector;
     public GameObject dialoguePanel;
 
-    public Vector2 ActualDirection;
-
     private Vector3 respawnPoint;
-    private int Xdirection = 1;
-    private int Ydirection = 0;
+    private int direction = 1;
     private bool m_FacingRight;
 
     public float xVelocity;
@@ -37,10 +33,11 @@ public class PlayerMovement : MonoBehaviour
 
     private bool isDashLockoutTimeUp = true;
 
-    private string directionFacing = "";
     private bool isDashTimeUp = true;
     private bool isDashRecharged;
     private bool isdoubleJumpAvaliable;
+
+    private TrailRenderer _renderer;
 
     private BoxCollider2D boxCollider;
     private Rigidbody2D body;
@@ -49,6 +46,7 @@ public class PlayerMovement : MonoBehaviour
     {
         body = GetComponent<Rigidbody2D>();
         boxCollider = GetComponent<BoxCollider2D>();
+        _renderer = GetComponent <TrailRenderer>();
         respawnPoint = transform.position;
     }
 
@@ -74,7 +72,7 @@ public class PlayerMovement : MonoBehaviour
         //move left right
         if (Input.GetKey(KeyCode.A))
         {
-            Xdirection = -1;
+            direction = -1;
             body.velocity = new Vector2(body.velocity.x - 1, body.velocity.y);
 
             if ((body.velocity.x * -1) > moveSpeed)
@@ -82,32 +80,14 @@ public class PlayerMovement : MonoBehaviour
                 body.velocity = new Vector2(Mathf.Floor(body.velocity.x + Friction), body.velocity.y);
             }
         }
-        else if (Input.GetKey(KeyCode.D))
+        if (Input.GetKey(KeyCode.D))
         {
-            Xdirection = 1;
+            direction = 1;
             body.velocity = new Vector2(body.velocity.x + 1, body.velocity.y);
             if (body.velocity.x > moveSpeed)
             {
                 body.velocity = new Vector2(Mathf.Floor(body.velocity.x - Friction), body.velocity.y);
             }
-        }
-        else
-        {
-            Xdirection = 0;
-        }
-
-
-        if (Input.GetKey(KeyCode.W))
-        {
-            Ydirection = 1;
-        }
-        else if (Input.GetKey(KeyCode.S))
-        {
-            Ydirection = -1;
-        }
-        else
-        {
-            Ydirection = 0;
         }
 
         //friction calculation
@@ -141,16 +121,16 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        ActualDirection = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")).normalized;
+        
 
         //jump
-        if (Input.GetKeyDown(KeyCode.J) && isDashLockoutTimeUp)
+        if (Input.GetKeyDown(KeyCode.Space) && isDashLockoutTimeUp)
         {
             Jump();
         }
 
         //adjustable jump height
-        if (Input.GetKeyUp(KeyCode.J) && body.velocity.y > 0)
+        if (Input.GetKeyUp(KeyCode.Space) && body.velocity.y > 0)
         {
             body.velocity = new Vector2(body.velocity.x, body.velocity.y / 2);
         }
@@ -165,7 +145,7 @@ public class PlayerMovement : MonoBehaviour
             coyoteCounter -= Time.deltaTime;
         }
 
-        if (Input.GetKey(KeyCode.K) && isDashRecharged == true && isDashTimeUp == true)
+        if (Input.GetKey(KeyCode.LeftShift) && isDashRecharged == true && isDashTimeUp == true)
         {
             dash();
         }
@@ -186,97 +166,26 @@ public class PlayerMovement : MonoBehaviour
     {
         isDashRecharged = false;
         StartCoroutine("DashTiming");
-        StartCoroutine("DashLockoutTiming");
-        body.velocity = ActualDirection * GroundedDashForce;
         if (IsGrounded())
         {
-
-            if (Xdirection > 0)
+            if (direction > 0)
             {
-                if(Ydirection > 0)
-                {
-                    body.velocity = new Vector2(body.velocity.x + (GroundedDashForce/2), body.velocity.y + (GroundedDashForce / 2));
-                }
-                else if (Ydirection < 0)
-                {
-                    body.velocity = new Vector2(body.velocity.x + (GroundedDashForce / 2), body.velocity.y - (GroundedDashForce / 2));
-                }
-                else
-                {
-                    body.velocity = new Vector2(body.velocity.x + GroundedDashForce, body.velocity.y);
-                }
-                
-            }
-            else if (Xdirection < 0)
-            {
-                if (Ydirection > 0)
-                {
-                    body.velocity = new Vector2(body.velocity.x - (GroundedDashForce / 2), body.velocity.y + (GroundedDashForce / 2));
-                }
-                else if (Ydirection < 0)
-                {
-                    body.velocity = new Vector2(body.velocity.x - (GroundedDashForce / 2), body.velocity.y - (GroundedDashForce / 2));
-                }
-                else
-                {
-                    body.velocity = new Vector2(body.velocity.x - GroundedDashForce, body.velocity.y);
-                }
+                body.velocity = new Vector2(body.velocity.x + GroundedDashForce, body.velocity.y);
             }
             else
             {
-                if (Ydirection > 0)
-                {
-                    body.velocity = new Vector2(body.velocity.x, body.velocity.y + (GroundedDashForce / yDashHeightDivider));
-                }
-                else if (Ydirection < 0)
-                {
-                    body.velocity = new Vector2(body.velocity.x, body.velocity.y - (GroundedDashForce / yDashHeightDivider));
-                }
+                body.velocity = new Vector2(body.velocity.x - GroundedDashForce, body.velocity.y);
             }
         }
         else
         {
-            if (Xdirection > 0)
+            if (direction > 0)
             {
-                if (Ydirection > 0)
-                {
-                    body.velocity = new Vector2(body.velocity.x + (AerialDashForce/2), body.velocity.y + (AerialDashForce / 2));
-                }
-                else if (Ydirection < 0)
-                {
-                    body.velocity = new Vector2(body.velocity.x + (AerialDashForce / 2), body.velocity.y - (AerialDashForce / 2));
-                }
-                else
-                {
-                    body.velocity = new Vector2(body.velocity.x + AerialDashForce, body.velocity.y);
-                }
-
-            }
-            else if (Xdirection < 0)
-            {
-                if (Ydirection > 0)
-                {
-                    body.velocity = new Vector2(body.velocity.x - (AerialDashForce / 2), body.velocity.y + (AerialDashForce / 2));
-                }
-                else if (Ydirection < 0)
-                {
-                    body.velocity = new Vector2(body.velocity.x - (AerialDashForce / 2), body.velocity.y - (AerialDashForce / 2));
-                }
-                else
-                {
-                    body.velocity = new Vector2(body.velocity.x - AerialDashForce, body.velocity.y);
-                }
+                body.velocity = new Vector2(body.velocity.x + AerialDashForce, body.velocity.y);
             }
             else
             {
-                if (Ydirection > 0)
-                {
-                    body.velocity = new Vector2(body.velocity.x, body.velocity.y + (AerialDashForce/yDashHeightDivider));
-                }
-                else if (Ydirection < 0)
-                {
-                    body.velocity = new Vector2(body.velocity.x, body.velocity.y - (AerialDashForce / yDashHeightDivider));
-                }
+                body.velocity = new Vector2(body.velocity.x - AerialDashForce, body.velocity.y);
             }
         }
     }
@@ -288,10 +197,11 @@ public class PlayerMovement : MonoBehaviour
         //ghost.makeGhost = true;
         //anim.SetBool("Dashing", true);
         isDashTimeUp = false;
-
+        _renderer.emitting = true;
 
         yield return new WaitForSeconds(MaxDashTime);
         isDashTimeUp = true;
+        _renderer.emitting = false;
         //anim.SetBool("Dashing", false);
         //ghost.makeGhost = false;
 
