@@ -8,7 +8,10 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float moveSpeed = 10f;
     [SerializeField] private float Friction;
 
-    
+    [Header("Dash")]
+    [SerializeField] private float GroundedDashForce;
+    [SerializeField] private float AerialDashForce;
+    [SerializeField] private float MaxDashTime = (float)0.2;
 
     [Header("Jump")]
     [SerializeField] private float JumpForce = 5;
@@ -27,6 +30,10 @@ public class PlayerMovement : MonoBehaviour
     public float xVelocity;
     public float yVelocity;
 
+    private bool isDashTimeUp = true;
+    private bool isDashRecharged;
+    private bool isdoubleJumpAvaliable;
+
     private BoxCollider2D boxCollider;
     private Rigidbody2D body;
     // Start is called before the first frame update
@@ -37,8 +44,7 @@ public class PlayerMovement : MonoBehaviour
         respawnPoint = transform.position;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void FixedUpdate()
     {
         body.constraints = RigidbodyConstraints2D.FreezeRotation;
         xVelocity = body.velocity.x;
@@ -78,28 +84,6 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        //jump
-        if (Input.GetKeyDown(KeyCode.J))
-        {
-            Jump();
-        }
-
-        //adjustable jump height
-        if (Input.GetKeyUp(KeyCode.J) && body.velocity.y > 0)
-        {
-            body.velocity = new Vector2(body.velocity.x, body.velocity.y / 2);
-        }
-
-        //coyote time
-        if (IsGrounded() && !(body.velocity.y >= JumpForce - 1))
-        {
-            coyoteCounter = coyoteTime;
-        }
-        else
-        {
-            coyoteCounter -= Time.deltaTime;
-        }
-
         //friction calculation
         if (IsGrounded())
         {
@@ -126,9 +110,93 @@ public class PlayerMovement : MonoBehaviour
                 }
             }
         }
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+
+        //jump
+        if (Input.GetKeyDown(KeyCode.J))
+        {
+            Jump();
+        }
+
+        //adjustable jump height
+        if (Input.GetKeyUp(KeyCode.J) && body.velocity.y > 0)
+        {
+            body.velocity = new Vector2(body.velocity.x, body.velocity.y / 2);
+        }
+
+        //coyote time
+        if (IsGrounded() && !(body.velocity.y >= JumpForce - 1))
+        {
+            coyoteCounter = coyoteTime;
+        }
+        else
+        {
+            coyoteCounter -= Time.deltaTime;
+        }
+
+        if (Input.GetKey(KeyCode.K) && isDashRecharged == true && isDashTimeUp == true)
+        {
+            dash();
+        }
+
+        //recharge dash
+        if (IsGrounded())
+        {
+            isDashRecharged = true;
+            isdoubleJumpAvaliable = true;
+        }
 
         // move fall detector with player
         fallDetector.transform.position = new Vector2(transform.position.x, fallDetector.transform.position.y);
+
+    }
+
+    private void dash()
+    {
+        isDashRecharged = false;
+        StartCoroutine("DashTiming");
+        if (IsGrounded())
+        {
+            if (direction > 0)
+            {
+                body.velocity = new Vector2(body.velocity.x + GroundedDashForce, body.velocity.y);
+            }
+            else
+            {
+                body.velocity = new Vector2(body.velocity.x - GroundedDashForce, body.velocity.y);
+            }
+        }
+        else
+        {
+            if (direction > 0)
+            {
+                body.velocity = new Vector2(body.velocity.x + AerialDashForce, body.velocity.y);
+            }
+            else
+            {
+                body.velocity = new Vector2(body.velocity.x - AerialDashForce, body.velocity.y);
+            }
+        }
+    }
+
+    IEnumerator DashTiming()
+    {
+
+        // execute block of code here
+        //ghost.makeGhost = true;
+        //anim.SetBool("Dashing", true);
+        isDashTimeUp = false;
+
+
+        yield return new WaitForSeconds(MaxDashTime);
+        isDashTimeUp = true;
+        //anim.SetBool("Dashing", false);
+        //ghost.makeGhost = false;
 
     }
 

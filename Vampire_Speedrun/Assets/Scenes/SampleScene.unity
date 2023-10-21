@@ -338,6 +338,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 15
   Friction: 1
+  GroundedDashForce: 20
+  AerialDashForce: 20
+  MaxDashTime: 2
   JumpForce: 16
   coyoteTime: 0.1
   platformLayerMask:
@@ -363,7 +366,7 @@ Rigidbody2D:
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 3
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: f194b9dcaedee634ca35779d746b94d0, type: 2}
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 1
@@ -377,7 +380,7 @@ BoxCollider2D:
   m_GameObject: {fileID: 606082847}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: f194b9dcaedee634ca35779d746b94d0, type: 2}
   m_IsTrigger: 0
   m_UsedByEffector: 1
   m_UsedByComposite: 0
@@ -492,9 +495,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a7d8e9ade2a86f48bb63c7a8550c19d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 0
-  currentHealth: 0
-  deadAnim: {fileID: 0}
 --- !u!114 &606082855
 MonoBehaviour:
   m_ObjectHideFlags: 0
