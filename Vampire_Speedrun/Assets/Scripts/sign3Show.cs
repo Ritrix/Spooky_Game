@@ -16,6 +16,7 @@ public class sign3Show : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerClose = true;
+            diaText.text = dialogue[0];
         }
     }
 
