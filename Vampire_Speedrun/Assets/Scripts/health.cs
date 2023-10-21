@@ -5,8 +5,8 @@ using UnityEngine;
 public class health : MonoBehaviour
 {
 
-    [SerializeField]public int maxHealth;
-    [SerializeField]public int currentHealth;
+    public int maxHealth;
+    public int currentHealth;
     public Animator deadAnim;
 
     // Start is called before the first frame update

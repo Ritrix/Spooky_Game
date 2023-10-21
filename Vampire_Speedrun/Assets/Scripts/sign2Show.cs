@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class sign3Show : MonoBehaviour
+public class sign2Show : MonoBehaviour
 {
     public TextMeshProUGUI diaText;
     public GameObject diaPanel;

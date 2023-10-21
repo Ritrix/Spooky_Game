@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class sign3Show : MonoBehaviour
+public class sign1Show : MonoBehaviour
 {
     public TextMeshProUGUI diaText;
     public GameObject diaPanel;
