@@ -8,15 +8,20 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float moveSpeed = 10f;
     [SerializeField] private float Friction;
 
-    [Header("Misc")]
-    [SerializeField] private LayerMask platformLayerMask;
-    private int direction = 1;
-    private bool m_FacingRight;
+    
 
     [Header("Jump")]
     [SerializeField] private float JumpForce = 5;
     [SerializeField] private float coyoteTime; //how much time a player gets to input a jump after falling off a platform
     private float coyoteCounter; //how much time has passed since a player fell off a platform
+
+    [Header("Misc")]
+    [SerializeField] private LayerMask platformLayerMask;
+    public GameObject fallDetector;
+
+    private Vector3 respawnPoint;
+    private int direction = 1;
+    private bool m_FacingRight;
 
     public float xVelocity;
     public float yVelocity;
@@ -28,6 +33,7 @@ public class PlayerMovement : MonoBehaviour
     {
         body = GetComponent<Rigidbody2D>();
         boxCollider = GetComponent<BoxCollider2D>();
+        respawnPoint = transform.position;
     }
 
     // Update is called once per frame
@@ -77,6 +83,12 @@ public class PlayerMovement : MonoBehaviour
             Jump();
         }
 
+        //adjustable jump height
+        if (Input.GetKeyUp(KeyCode.J) && body.velocity.y > 0)
+        {
+            body.velocity = new Vector2(body.velocity.x, body.velocity.y / 2);
+        }
+
         //coyote time
         if (IsGrounded() && !(body.velocity.y >= JumpForce - 1))
         {
@@ -114,6 +126,17 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
+        // move fall detector with player
+        fallDetector.transform.position = new Vector2(transform.position.x, fallDetector.transform.position.y);
+
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag == "FallDetector")
+        {
+            transform.position = respawnPoint;
+        }
     }
 
     public void Jump()
