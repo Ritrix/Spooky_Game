@@ -224,7 +224,7 @@ MonoBehaviour:
   cameraXVelThreshold: 7
   player: {fileID: 606082852}
   aheadDistance: 5
-  upDistance: 3
+  upDistance: 2
   cameraSpeed: 2
   fallCameraVelocity: 15
   transitionDuration: 2.5
@@ -257,7 +257,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6293693295436991367, guid: a9e81bf53398736469dec62388d1f187, type: 3}
       propertyPath: m_RootOrder
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 6293693295436991367, guid: a9e81bf53398736469dec62388d1f187, type: 3}
       propertyPath: m_LocalPosition.x
@@ -824,14 +824,6 @@ CompositeCollider2D:
         Y: 19950000
       - X: 4390000128
         Y: 19950000
-    - - X: 2220000000
-        Y: 20050002
-      - X: 2110000000
-        Y: 20050002
-      - X: 2110000000
-        Y: 9950000
-      - X: 2220000000
-        Y: 9950000
     - - X: 3329999872
         Y: 20050002
       - X: 3100000000
@@ -839,6 +831,14 @@ CompositeCollider2D:
       - X: 3100000000
         Y: 9950000
       - X: 3329999872
+        Y: 9950000
+    - - X: 2220000000
+        Y: 20050002
+      - X: 2110000000
+        Y: 20050002
+      - X: 2110000000
+        Y: 9950000
+      - X: 2220000000
         Y: 9950000
     - - X: 3700000000
         Y: 10050000
@@ -9199,6 +9199,8 @@ Tilemap:
     m_Data: {fileID: 11400000, guid: 7a6abbbc069f390459a7f98102c96211, type: 2}
   - m_RefCount: 1
     m_Data: {fileID: 11400000, guid: ccb06713c1126914d872cc47ac3dbecd, type: 2}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
   m_TileSpriteArray:
   - m_RefCount: 623
     m_Data: {fileID: -1914262894, guid: 3ceff4de35c4e7e45a62f617927093fc, type: 3}
@@ -9216,6 +9218,8 @@ Tilemap:
     m_Data: {fileID: 1764822303, guid: 3ceff4de35c4e7e45a62f617927093fc, type: 3}
   - m_RefCount: 1
     m_Data: {fileID: 1339016667, guid: 3ceff4de35c4e7e45a62f617927093fc, type: 3}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
   m_TileMatrixArray:
   - m_RefCount: 773
     m_Data:
@@ -9242,7 +9246,7 @@ Tilemap:
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Origin: {x: -12, y: -9, z: 0}
-  m_Size: {x: 525, y: 15, z: 1}
+  m_Size: {x: 525, y: 19, z: 1}
   m_TileAnchor: {x: 0.5, y: 0.5, z: 0}
   m_TileOrientation: 0
   m_TileOrientationMatrix:
@@ -9467,7 +9471,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6293693295436991367, guid: a9e81bf53398736469dec62388d1f187, type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6293693295436991367, guid: a9e81bf53398736469dec62388d1f187, type: 3}
       propertyPath: m_LocalPosition.x
