@@ -8,6 +8,7 @@ TagManager:
   - enemy
   - Sign
   - Checkpoint
+  - EndOfLevel
   layers:
   - Default
   - TransparentFX

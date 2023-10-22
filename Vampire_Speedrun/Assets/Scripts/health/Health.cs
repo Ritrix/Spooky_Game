@@ -39,7 +39,8 @@ public class Health : MonoBehaviour
         {
             //globalVariables.health = Mathf.Clamp(globalVariables.health - _damage, 0, startingHealth);
             globalVariables.health -= _damage;
-            StartCoroutine("invincibleTiming");
+            invincible = true;
+            StartCoroutine(invincibleTiming());
 
             
 

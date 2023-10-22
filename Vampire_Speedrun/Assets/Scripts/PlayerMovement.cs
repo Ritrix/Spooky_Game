@@ -6,6 +6,7 @@ public class PlayerMovement : MonoBehaviour
 {
     public ParticleSystem particleSystem;
     Health health = new Health();
+    
 
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 10f;
@@ -49,6 +50,7 @@ public class PlayerMovement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        globalVariables.isFinishedGame = false;
         body = GetComponent<Rigidbody2D>();
         boxCollider = GetComponent<BoxCollider2D>();
         _renderer = GetComponent <TrailRenderer>();
@@ -244,7 +246,8 @@ public class PlayerMovement : MonoBehaviour
         if (collision.tag == "FallDetector")
         {
             transform.position = respawnPoint;
-            health.takeDamage(1);
+            //health.takeDamage(1);
+            globalVariables.health -= 1;
         }
         if (collision.tag == "Sign")
         {
@@ -254,7 +257,10 @@ public class PlayerMovement : MonoBehaviour
         {
             respawnPoint = transform.position;
         }
-        
+        if (collision.tag == "EndOfLevel")
+        {
+            globalVariables.isFinishedGame = true;
+        }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
