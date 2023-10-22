@@ -5,6 +5,8 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     public ParticleSystem particleSystem;
+    Health health = new Health();
+
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 10f;
     [SerializeField] private float Friction;
@@ -37,6 +39,8 @@ public class PlayerMovement : MonoBehaviour
     private bool isDashTimeUp = true;
     private bool isDashRecharged;
     private bool isdoubleJumpAvaliable;
+
+    public bool playerFell;
 
     private TrailRenderer _renderer;
 
@@ -240,6 +244,7 @@ public class PlayerMovement : MonoBehaviour
         if (collision.tag == "FallDetector")
         {
             transform.position = respawnPoint;
+            health.takeDamage(1);
         }
         if (collision.tag == "Sign")
         {

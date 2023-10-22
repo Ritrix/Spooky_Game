@@ -1,39 +1,61 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Health : MonoBehaviour
 {
 
     [SerializeField]private float startingHealth;
-    public float currentHealth { get; private set; }
+    public float delayMax = 1f;
+    public bool invincible = false;
+    public float currentHealth;
+
+    private void FixedUpdate()
+    {
+        currentHealth = globalVariables.health;
+        if (globalVariables.health > 0)
+        {
+            //player hurt
+
+        }
+        else if (globalVariables.health <= 0)
+        {
+            //player dead
+
+            SceneManager.LoadScene(4);
+        }
+    }
 
     // Start is called before the first frame update
     private void Awake()
     {
-        currentHealth = startingHealth;
+        globalVariables.health = startingHealth;
     }
 
     public void takeDamage(float _damage)
     {
-        currentHealth = Mathf.Clamp(currentHealth - _damage, 0, startingHealth);
+        if (!invincible)
+        {
+            //globalVariables.health = Mathf.Clamp(globalVariables.health - _damage, 0, startingHealth);
+            globalVariables.health -= _damage;
+            StartCoroutine("invincibleTiming");
 
-        if (currentHealth > 0)
-        {
-            //player hurt
+            
+
+
         }
-        else
-        {
-            //player dead
-        }
+
+
+
     }
 
-    // Update is called once per frame
-    void Update()
+    IEnumerator invincibleTiming()
     {
-        if (Input.GetKeyDown(KeyCode.H))
-        {
-            takeDamage(1);
-        }
+        invincible = true;
+        yield return new WaitForSeconds(delayMax);
+        invincible = false;
     }
+
+
 }
