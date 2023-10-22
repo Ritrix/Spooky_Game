@@ -9,6 +9,7 @@ public class PlayerMovement : MonoBehaviour
     Health health = new Health();
 
     private AudioSource audioSource;
+    public Animator anim;
 
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 10f;
@@ -56,6 +57,13 @@ public class PlayerMovement : MonoBehaviour
 
     private BoxCollider2D boxCollider;
     private Rigidbody2D body;
+
+    private void Awake()
+    {
+        anim = GetComponent<Animator>();
+        anim.SetBool("Jumping", false);
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -142,7 +150,17 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
+        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.LeftArrow))
+        {
+            anim.SetBool("Running", true);
+        }
+
+        if (Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.D) || Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.LeftArrow))
+        {
+            anim.SetBool("Running", false);
+        }
+
         if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.LeftArrow))
         {
             if (IsGrounded())
@@ -171,8 +189,10 @@ public class PlayerMovement : MonoBehaviour
             }
         }
         //jump
+        JumpAnim();
         if ((Input.GetKeyDown(KeyCode.Space) && isDashLockoutTimeUp)||(Input.GetKeyDown(KeyCode.J) && isDashLockoutTimeUp))
         {
+            anim.SetBool("Jumping", true);
             Jump();
         }
 
@@ -258,7 +278,7 @@ public class PlayerMovement : MonoBehaviour
 
         // execute block of code here
         //ghost.makeGhost = true;
-        //anim.SetBool("Dashing", true);
+        anim.SetBool("Dashing", true);
         isDashTimeUp = false;
         _renderer.emitting = true;
 
@@ -269,7 +289,7 @@ public class PlayerMovement : MonoBehaviour
         yield return new WaitForSeconds(MaxDashTime);
         isDashTimeUp = true;
         _renderer.emitting = false;
-        //anim.SetBool("Dashing", false);
+        anim.SetBool("Dashing", false);
         //ghost.makeGhost = false;
 
     }
@@ -360,6 +380,16 @@ public class PlayerMovement : MonoBehaviour
             isdoubleJumpAvaliable = false;
         }
         coyoteCounter = 0;
+    }
+
+    private void JumpAnim()
+    {
+        anim.SetInteger("yVel", (int)yVelocity);
+        anim.SetBool("Grounded", IsGrounded());
+        if (anim.GetBool("Jumping") && IsGrounded() && !Input.GetKey(KeyCode.J))
+        {
+            anim.SetBool("Jumping", false);
+        }
     }
 
     public bool IsGrounded()
