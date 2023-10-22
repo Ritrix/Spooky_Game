@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+    public ParticleSystem particleSystem;
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 10f;
     [SerializeField] private float Friction;
@@ -168,6 +169,11 @@ public class PlayerMovement : MonoBehaviour
 
     }
 
+    void DoubleJumpParticles()
+    {
+        particleSystem.Play();
+    }
+
     private void dash()
     {
         isDashRecharged = false;
@@ -239,6 +245,11 @@ public class PlayerMovement : MonoBehaviour
         {
             dialoguePanel.SetActive(true);
         }
+        if (collision.tag == "Checkpoint")
+        {
+            respawnPoint = transform.position;
+        }
+        
     }
 
     private void OnTriggerExit2D(Collider2D collision)
@@ -258,6 +269,7 @@ public class PlayerMovement : MonoBehaviour
         else if (isdoubleJumpAvaliable)
         {
             body.velocity = new Vector2(body.velocity.x, JumpForce);
+            DoubleJumpParticles();
             isdoubleJumpAvaliable = false;
         }
         coyoteCounter = 0;
