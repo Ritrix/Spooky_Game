@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -70,11 +71,6 @@ public class PlayerMovement : MonoBehaviour
     private void FixedUpdate()
     {
 
-        if (Input.GetKey(KeyCode.F))
-        {
-            transform.position = respawnPoint;
-        }
-
         body.constraints = RigidbodyConstraints2D.FreezeRotation;
         xVelocity = body.velocity.x;
         yVelocity = body.velocity.y;
@@ -93,7 +89,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         //move left right
-        if (Input.GetKey(KeyCode.A))
+        if (Input.GetKey(KeyCode.A)|| Input.GetKey(KeyCode.LeftArrow))
         {
             direction = -1;
             body.velocity = new Vector2(body.velocity.x - 1, body.velocity.y);
@@ -103,7 +99,7 @@ public class PlayerMovement : MonoBehaviour
                 body.velocity = new Vector2(Mathf.Floor(body.velocity.x + Friction), body.velocity.y);
             }
         }
-        if (Input.GetKey(KeyCode.D))
+        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
         {
             direction = 1;
             body.velocity = new Vector2(body.velocity.x + 1, body.velocity.y);
@@ -116,7 +112,7 @@ public class PlayerMovement : MonoBehaviour
         //friction calculation
         if (IsGrounded())
         {
-            if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.A))
+            if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.LeftArrow))
             {
                 if (body.velocity.x > moveSpeed)
                 {
@@ -147,7 +143,7 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         
-        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.A))
+        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.LeftArrow))
         {
             if (IsGrounded())
             {
@@ -175,13 +171,13 @@ public class PlayerMovement : MonoBehaviour
             }
         }
         //jump
-        if (Input.GetKeyDown(KeyCode.Space) && isDashLockoutTimeUp)
+        if ((Input.GetKeyDown(KeyCode.Space) && isDashLockoutTimeUp)||(Input.GetKeyDown(KeyCode.J) && isDashLockoutTimeUp))
         {
             Jump();
         }
 
         //adjustable jump height
-        if (Input.GetKeyUp(KeyCode.Space) && body.velocity.y > 0)
+        if ((Input.GetKeyUp(KeyCode.Space) && body.velocity.y > 0)|| (Input.GetKeyUp(KeyCode.J) && body.velocity.y > 0))
         {
             body.velocity = new Vector2(body.velocity.x, body.velocity.y / 2);
         }
@@ -196,7 +192,7 @@ public class PlayerMovement : MonoBehaviour
             coyoteCounter -= Time.deltaTime;
         }
 
-        if (Input.GetKey(KeyCode.LeftShift) && isDashRecharged == true && isDashTimeUp == true)
+        if ((Input.GetKey(KeyCode.LeftShift) && isDashRecharged == true && isDashTimeUp == true) || (Input.GetKey(KeyCode.K) && isDashRecharged == true && isDashTimeUp == true))
         {
             dash();
         }
@@ -330,6 +326,10 @@ public class PlayerMovement : MonoBehaviour
         if (collision.tag == "EndOfLevel")
         {
             globalVariables.isFinishedGame = true;
+        }
+        if (collision.tag == "EndOfTutorial")
+        {
+            SceneManager.LoadScene(0);
         }
     }
 
