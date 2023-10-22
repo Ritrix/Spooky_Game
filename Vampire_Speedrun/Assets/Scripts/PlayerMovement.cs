@@ -6,7 +6,8 @@ public class PlayerMovement : MonoBehaviour
 {
     public ParticleSystem particleSystem;
     Health health = new Health();
-    
+
+    private AudioSource audioSource;
 
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 10f;
@@ -22,6 +23,13 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float JumpForce = 5;
     [SerializeField] private float coyoteTime; //how much time a player gets to input a jump after falling off a platform
     private float coyoteCounter; //how much time has passed since a player fell off a platform
+
+    [Header("Audio")]
+    [SerializeField] private AudioClip jumpStartAudio;
+    [SerializeField] private AudioClip jumpEndAudio;
+    [SerializeField] private AudioClip runAudio;
+    [SerializeField] private AudioClip dashAudio;
+    private bool playLandAudio;
 
     [Header("Misc")]
     [SerializeField] private LayerMask platformLayerMask;
@@ -50,6 +58,8 @@ public class PlayerMovement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        playLandAudio = false;
+        audioSource = GetComponent<AudioSource>();
         globalVariables.isFinishedGame = false;
         body = GetComponent<Rigidbody2D>();
         boxCollider = GetComponent<BoxCollider2D>();
@@ -129,13 +139,41 @@ public class PlayerMovement : MonoBehaviour
                 }
             }
         }
+
+        
     }
 
     // Update is called once per frame
     void Update()
     {
         
-
+        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.A))
+        {
+            if (IsGrounded())
+            {
+                if (!audioSource.isPlaying)
+                {
+                    audioSource.loop = true;
+                    audioSource.clip = runAudio;
+                    audioSource.Play();
+                }
+                
+            }
+            else
+            {
+                if (audioSource.clip == runAudio)
+                {
+                    audioSource.Stop();
+                }
+            }
+        }
+        else
+        {
+            if (audioSource.clip == runAudio)
+            {
+                audioSource.Stop();
+            }
+        }
         //jump
         if (Input.GetKeyDown(KeyCode.Space) && isDashLockoutTimeUp)
         {
@@ -172,6 +210,17 @@ public class PlayerMovement : MonoBehaviour
 
         // move fall detector with player
         fallDetector.transform.position = new Vector2(transform.position.x, fallDetector.transform.position.y);
+
+        if (!IsGrounded())
+        {
+            playLandAudio = false;
+        }
+
+        if (IsGrounded() && playLandAudio == false)
+        {
+            StartCoroutine("landAudio");
+            playLandAudio = true;
+        }
 
     }
 
@@ -217,9 +266,30 @@ public class PlayerMovement : MonoBehaviour
         isDashTimeUp = false;
         _renderer.emitting = true;
 
+        audioSource.loop = false;
+        audioSource.clip = dashAudio;
+        audioSource.Play();
+
         yield return new WaitForSeconds(MaxDashTime);
         isDashTimeUp = true;
         _renderer.emitting = false;
+        //anim.SetBool("Dashing", false);
+        //ghost.makeGhost = false;
+
+    }
+    IEnumerator landAudio()
+    {
+
+        // execute block of code here
+        //ghost.makeGhost = true;
+        //anim.SetBool("Dashing", true);
+        audioSource.loop = false;
+        audioSource.clip = jumpEndAudio;
+        audioSource.Play();
+
+
+        yield return new WaitForSeconds(0.1f);
+
         //anim.SetBool("Dashing", false);
         //ghost.makeGhost = false;
 
@@ -275,10 +345,16 @@ public class PlayerMovement : MonoBehaviour
     {
         if (IsGrounded() || coyoteCounter > 0)
         {
+            audioSource.loop = false;
+            audioSource.clip = jumpStartAudio;
+            audioSource.Play();
             body.velocity = new Vector2(body.velocity.x, JumpForce);
         }
         else if (isdoubleJumpAvaliable)
         {
+            audioSource.loop = false;
+            audioSource.clip = jumpStartAudio;
+            audioSource.Play();
             body.velocity = new Vector2(body.velocity.x, JumpForce);
             DoubleJumpParticles();
             isdoubleJumpAvaliable = false;

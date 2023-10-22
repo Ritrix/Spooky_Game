@@ -80,6 +80,7 @@ public class Timer : MonoBehaviour
     public void captureTime()
     {
         globalVariables.finishTime = currentTime;
+        SceneManager.LoadScene(5);
     }
 
 }
