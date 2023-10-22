@@ -52,6 +52,12 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+
+        if (Input.GetKey(KeyCode.F))
+        {
+            transform.position = respawnPoint;
+        }
+
         body.constraints = RigidbodyConstraints2D.FreezeRotation;
         xVelocity = body.velocity.x;
         yVelocity = body.velocity.y;
